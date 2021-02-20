@@ -88,10 +88,11 @@ export const router = new Router({
     },
     {
       path: '/coba',
-      name: 'uji2',
+      name: 'coba',
       // lazy-loaded
       component: () => import('./views/Uji2.vue')
     },
+
     {
       path: '/user',
       name: 'user',

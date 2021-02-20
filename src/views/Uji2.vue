@@ -8,7 +8,7 @@
       <div class="w3-third">
         <div class="w3-white w3-text-grey w3-card-4">
           <div class="w3-display-container">
-            <img src="//ssl.gstatic.com/accounts/ui/avatar_2x.png" style="width:100%" alt="Avatar">
+            <img src="../assets/2.png" style="width:100%" alt="Avatar">
             <div class="w3-display-bottomleft w3-container w3-text-black">
           </div>
         </div>
@@ -59,11 +59,7 @@
         <h2 class="w3-text-grey w3-padding-16"><i class="fa fa-suitcase fa-fw w3-margin-right w3-xxlarge w3-text-teal"></i>Work Experience</h2>
         <div class="w3-container">
           <h5 class="w3-opacity"><b>Back-End Developer / Web Absen.com</b></h5>
-          <h6 class="w3-text-teal"><i class="fa fa-calendar fa-fw w3-margin-right"></i>Dec 2020 - <span cl
-[Photo]
-ass="w3-tag w3-
-[Photo]
-teal w3-round">Current</span></h6>
+          <h6 class="w3-text-teal"><i class="fa fa-calendar fa-fw w3-margin-right"></i>Dec 2020 - <span class="w3-tag w3-teal w3-round">Current</span></h6>
           <p>Lorem ipsum dolor sit amet. Praesentium magnam consectetur vel in deserunt aspernatur est reprehenderit sunt hic. Nulla tempora soluta ea et odio, unde doloremque repellendus iure, iste.</p><hr>
         </div>
         <div class="w3-container">
@@ -105,8 +101,6 @@ teal w3-round">Current</span></h6>
 </template>
 
 <script>
-// @ is an alias to /src
-// import Header from "@/components/Header.vue";
 export default {
   name: 'Uji2',
   data() {
@@ -117,3 +111,26 @@ export default {
   }
 };
 </script>
+<style scoped>
+.jumbotron {
+    position: relative;
+    background-image: linear-gradient(#f37a7a, #53b4ec);
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    overflow: hidden;
+}
+
+.city {
+  background-color: #98a5d1;
+  color: white;
+  border: 2px solid black;
+  margin: 20px;
+  padding: 20px;
+}
+
+  .card{
+    background-color: #decb97;
+    font-family: monospace;
+  }
+</style>

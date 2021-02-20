@@ -1,97 +1,127 @@
 <template>
-<div><br/>
-  <div class="container">
-    <div class="list row ">
-      <div class="col-sm-8"><br/>
-        <div class="input-group mb-3">
-          <input type="text" class="form-control" placeholder="Search Username"
-            v-model="username"/>
-          <div class="input-group-append">
-            <button class="btn btn-outline-secondary" type="button"
-              @click="searchUsername"
-            >
-              Search
-            </button>
-          </div>
-        </div>
-      </div>
-      <div class="col-sm-4">
-      <v-card-actions>
-        <button class="glow-on-hover" >
-          <router-link to="/register" class="nav-link text-white"><b>Tambah siswa</b></router-link>
-        </button>
-      </v-card-actions>
-      </div>
-    </div>
-  </div>
-    <v-card-title>DATA SISWA</v-card-title>
-      <v-data-table 
-          :headers="headers"
-          item-key="not"
-          
-          loading-text="Loading... Please wait"
-            :items="user"
-            :items-per-page="5"
-            class="elevation-1"
-        >
-          <template v-slot:[`item.actions`]="{ item }">
-            <v-icon small class="mr-2" @click="editUser(item.id)">mdi-pencil</v-icon>
-            <v-icon small @click="deleteUser(item.id), snackbar = true">mdi-delete</v-icon>
-          </template>
-      </v-data-table><br>
-  <div class="text-center">
-  <v-snackbar
-      v-model="snackbar"
-      :multi-line="multiLine"
-    >
-      {{ text }}
+  <div class="container"><br><br>
+  <v-card elevation="2" class="table-bordered">
 
-      <template v-slot:action="{ attrs }">
-        <v-btn
-          color="red"
-          text
-          v-bind="attrs"
-          @click="snackbar = false"
-        >
-          Close
-        </v-btn>
+    <v-card-title>
+      DATA SISWA
+      <v-spacer></v-spacer>
+      <v-text-field
+        v-model="username"
+        append-icon="mdi-magnify"
+        label="Search Username"
+        single-line
+        hide-details
+      ></v-text-field>
+    </v-card-title>
+
+     <v-card-actions class="glow-on-hover ">
+            <router-link to="register" class="btn btn-lg  nav-link btn-block text-white">Tambah siswa</router-link>
+     </v-card-actions>
+
+    <v-data-table
+      :headers="headers"
+      :items="user"
+      :search="username"
+      :hide-default-header="hideHeaders"
+      :show-select="showSelect"
+      :loading="isLoading"
+      item-key="name"
+      class="elevation-1 table-bordered"
+    >
+      <template
+        v-if="isEnabled('body')"
+        v-slot:body="{ items }"
+      >
+        <thead>
+          <tr class="text-center">
+            <th>Username</th>
+            <th>Email</th>
+            <th>Password / Token</th>
+            <th>Nama</th>
+            <th>Nisn</th>
+            <th>Kelas</th>
+            <th>Alamat</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="item in items"
+            :key="item.name"
+          >
+            <td>{{ item.username }}</td>
+            <td>{{ item.email }}</td>
+            <td>{{ item.password }}</td>
+            <td>{{ item.nama }}</td>
+            <td>{{ item.nisn }}</td>
+            <td>{{ item.kelas }}</td>
+            <td>{{ item.alamat }}</td>
+            <td>
+            <v-icon  class="small" @click="editUser(item.id)">mdi-pencil</v-icon>         
+            <v-icon  class="small" @click="deleteUser(item.id), snackbar = true">mdi-delete</v-icon>
+            </td>
+          </tr>
+        </tbody>
+        <div class="text-center">
+        <v-snackbar
+            v-model="snackbar"
+            :multi-line="multiLine"
+          >
+            {{ text }}
+
+            <template v-slot:action="{ attrs }">
+              <v-btn
+                color="red"
+                text
+                v-bind="attrs"
+                @click="snackbar = false"
+              >
+                Close
+              </v-btn>
+            </template>
+          </v-snackbar> 
+      </div><br/>
       </template>
-    </v-snackbar>
-  </div><br/>
-</div>
+    </v-data-table>
+    </v-card>
+  </div>
 </template>
 
 <script>
 import UserDataService from "../services/UserDataService";
-
-export default {
-  name: "admin",
-  data() {
-    return {
-      multiLine: true,
-      snackbar: false,
-      text: `Data Berhasil di Hapus`,
-      user: [],
-      headers: [
-        { text: "ID", align: "id", sortable: false, value: "id" },
-        { text: "Username", value: "username", sortable: false },
+ export default {
+    data () {
+      return {
+        user: [],
+        currentUser: null,
+        currentIndex: -1,
+        username: "",
+        enabled: 'body',
+        search: null,
+        slots: [
+          'body'
+        ],
+        multiLine: true,
+        snackbar: false,
+        text: `Data Berhasil di Hapus`,
+        headers: [
+        { text: "Username", align: "username", sortable: false, value: "username" },
         { text: "Email", value: "email", sortable: false },
-        { text: "Password", value: "password", sortable: false },
-        { text: "Created At", value: "createdAt", sortable: false },
-        { text: "Updated At", value: "updatedAt", sortable: false },
+        { text: "Password ", value: "password", sortable: false },
         { text: "Nama", value: "nama", sortable: false },
         { text: "NISN", value: "nisn", sortable: false },
         { text: "Kelas", value: "kelas", sortable: false },
         { text: "Alamat", value: "alamat", sortable: false },
-        { text: "Actions", value: "actions", sortable: false },
-      ], 
-      currentUser: null,
-      currentIndex: -1,
-      username: ""
-    };
-  },
-  methods: {
-    retrieveUser() {
+        ],
+      }
+    },
+    methods: {
+    // getColor (createdAt) {
+    //     if (createdAt < 12) return 'red'
+    //     else if (createdAt > 8) return 'orange'
+    //     else return 'green'
+    //   },
+   retrieveUser() {
       UserDataService.getAll()
         .then(response => {
           this.user = response.data;
@@ -101,31 +131,17 @@ export default {
           console.log(e);
         });
     },
-     editUser(id) {
-      this.$router.push({ name: "edit", params: { id: id } });
-    },
+
     refreshList() {
       this.retrieveUser();
       this.currentUser = null;
       this.currentIndex = -1;
+},
+
+    editUser(id) {
+      this.$router.push({ name: "edit", params: { id: id } });
     },
 
-    setActiveUser(user, index) {
-      this.currentUser = user;
-      this.currentIndex = index;
-    },
-
-     removeAllUser() {
-      UserDataService.deleteAll()
-        .then((response) => {
-          console.log(response.data);
-          this.refreshList();
-        })
-        .catch((e) => {
-          console.log(e);
-        });
-    },
-    
     searchUsername() {
       UserDataService.findByUsername(this.username)
         .then(response => {
@@ -136,7 +152,7 @@ export default {
           console.log(e);
         });
     },
-   deleteUser(id) {
+    deleteUser(id) {
       UserDataService.delete(id)
         .then(() => {
           this.refreshList();
@@ -144,14 +160,40 @@ export default {
         .catch((e) => {
           console.log(e);
         });
-    }
+    },
+    isEnabled (slot) {
+        return this.enabled === slot
+      }
   },
-  mounted() {
-    this.retrieveUser();
-  }
-};
-</script>
+    computed: {
+      showSelect () {
+        return this.isEnabled('header.data-table-select') || this.isEnabled('item.data-table-select')
+      },
+      hideHeaders () {
+        return !this.showSelect
+      },
+      isLoading () {
+        return this.isEnabled('progress')
+      }
+    },
 
+    watch: {
+      enabled (slot) {
+        if (slot === 'no-data') {
+          this.items = []
+        } else if (slot === 'no-results') {
+          this.search = '...'
+        } else {
+          this.search = null
+          this.items = []
+        }
+      }
+    },
+    mounted() {
+    this.retrieveUser();
+    }
+  }
+</script>
 <style scoped>
 .ka {
   background-image: linear-gradient(#db6b67, #edb132);
